@@ -3,6 +3,8 @@ Notes :
   - "motor_control.ino" must be in a folder named "motor_control"
 */
 
+
+
 #include <Arduino.h>
 
 // Pin definition
@@ -28,8 +30,9 @@ void setup()
   pinMode(ENCODER_A, INPUT_PULLUP);                                      // WARNING: CH-A signal nominally high
   pinMode(ENCODER_B, INPUT_PULLUP);                                      // WARNING: CH-B signal nominally high
   attachInterrupt(digitalPinToInterrupt(ENCODER_A), encoderISRA, CHANGE); // interrupt on CH-A only
-
-  delay(100);
+  attachInterrupt(digitalPinToInterrupt(ENCODER_B), encoderISRA, CHANGE);
+  
+  delay(100); // Why?
 }
 
 void loop() {
@@ -38,7 +41,7 @@ void loop() {
   // 0-511 for reverse rotation; 512-1023 for forward rotation
   if (sensorValue < 512) {
     // Reverse rotation
-    int reversePWM = -(sensorValue - 511) / 2;
+    int reversePWM = (511 - sensorValue) / 2;
     analogWrite(LPWM_Output, 0);
     analogWrite(RPWM_Output, reversePWM);
   }
@@ -50,16 +53,16 @@ void loop() {
   }
 
   // Send count via serial; use "println" to send a string; use "write" for improved performance
-  Serial.println(String(sensorValue) + "," + String(pos) + ", " + String(digitalRead(ENCODER_A)) + ", " + String(digitalRead(ENCODER_B))); // pos updated in the ISR
+  Serial.println(String(sensorValue) + ", " + String(pos) + ", " + String(digitalRead(ENCODER_A)) + ", " + String(digitalRead(ENCODER_B))); // pos updated in the ISR
 
-  delay(1);
+  delay(100/1024);
 }
 
 void encoderISRA() {
   // Encoder interrupt service routine; detect CH-A state transition, then check state of CH-B (HIGH/LOW)
   // CASE 1: LOW-HIGH transition on CH-A
   if (digitalRead(ENCODER_A)){
-    if (!digitalRead(ENCODER_B)){ //CH-B is HIGH -> Negative increment
+    if (digitalRead(ENCODER_B)){ //CH-B is HIGH -> Negative increment
       if (pos == -max_pos){ //RESET
         pos = 0;
       }
@@ -73,6 +76,24 @@ void encoderISRA() {
       }
       else{
         pos++;
+      }
+    }
+  }
+  else{ //CH-A is LOW
+    if (digitalRead(ENCODER_B)){ //CH-B is HIGH -> Positive increment
+      if (pos == max_pos){ //RESET
+        pos = 0;
+      }
+      else{
+        pos++;
+      }
+    }
+    else{ //CH-B is LOW -> Lower increment
+      if (pos == -max_pos){ //RESET
+        pos = 0;
+      }
+      else{
+        pos--;
       }
     }
   }
