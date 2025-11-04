@@ -55,7 +55,7 @@ void loop() {
   // Send count via serial; use "println" to send a string; use "write" for improved performance
   Serial.println(String(sensorValue) + ", " + String(pos) + ", " + String(digitalRead(ENCODER_A)) + ", " + String(digitalRead(ENCODER_B))); // pos updated in the ISR
 
-  delay(100/1024);
+  delay(1000/1024);
 }
 
 void encoderISRA() {
