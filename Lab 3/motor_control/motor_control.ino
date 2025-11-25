@@ -30,8 +30,7 @@ void setup()
   pinMode(ENCODER_A, INPUT_PULLUP);                                      // WARNING: CH-A signal nominally high
   pinMode(ENCODER_B, INPUT_PULLUP);                                      // WARNING: CH-B signal nominally high
   attachInterrupt(digitalPinToInterrupt(ENCODER_A), encoderISRA, CHANGE); // interrupt on CH-A only
-  attachInterrupt(digitalPinToInterrupt(ENCODER_B), encoderISRA, CHANGE);
-  
+
   delay(100); // Why?
 }
 
@@ -55,7 +54,7 @@ void loop() {
   // Send count via serial; use "println" to send a string; use "write" for improved performance
   Serial.println(String(sensorValue) + ", " + String(pos) + ", " + String(digitalRead(ENCODER_A)) + ", " + String(digitalRead(ENCODER_B))); // pos updated in the ISR
 
-  delay(1000/1024);
+  delay(1000/14);
 }
 
 void encoderISRA() {
@@ -67,7 +66,7 @@ void encoderISRA() {
         pos = 0;
       }
       else{
-        pos--;
+        pos-2;
       }
     }
     else{ //CH-B is LOW -> Positive increment
@@ -75,7 +74,7 @@ void encoderISRA() {
         pos = 0;
       }
       else{
-        pos++;
+        pos+2;
       }
     }
   }
@@ -85,7 +84,7 @@ void encoderISRA() {
         pos = 0;
       }
       else{
-        pos++;
+        pos+2;
       }
     }
     else{ //CH-B is LOW -> Lower increment
@@ -93,7 +92,7 @@ void encoderISRA() {
         pos = 0;
       }
       else{
-        pos--;
+        pos-2;
       }
     }
   }
