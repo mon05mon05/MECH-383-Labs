@@ -36,3 +36,4 @@ ax[2].set_ylabel('output shaft angular speed (RPM)')
 
 
 plt.show()
+
